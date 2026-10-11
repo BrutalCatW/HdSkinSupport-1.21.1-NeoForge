@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.github.gravitlauncher.forge.hdskinsupport.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "MagicMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

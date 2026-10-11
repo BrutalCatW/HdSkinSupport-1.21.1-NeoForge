@@ -1,0 +1,30 @@
+// HD Skin Support под NeoForge 1.21.1.
+// Связка плагина и Gradle — как в официальном MDK (NeoForgeMDKs/MDK-1.21.1-ModDevGradle):
+// net.neoforged.moddev 2.0.148 + Gradle 9.2.1, Java 21.
+// Сборка: $env:JAVA_HOME="C:\Program Files\Zulu\zulu-21"; ./gradlew.bat build
+// Результат: build/libs/hdskinsupport-neoforge-<mod_version>.jar — только в клиентские mods.
+
+plugins {
+    id 'java'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+
+version = mod_version
+group = 'com.github.gravitlauncher.forge.hdskinsupport'
+
+base {
+    archivesName = 'hdskinsupport-neoforge'
+}
+
+// Minecraft 1.21.1 идёт с Java 21
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+// Мод без кода (lowcodefml): только миксин, описание — готовый файл
+// src/main/resources/META-INF/neoforge.mods.toml, запуски из IDE не нужны
+neoForge {
+    version = project.neo_version
+}

@@ -4,8 +4,11 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.HttpTexture;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * HD-скины. Ванильный {@code HttpTexture.processLegacySkin} пропускает только 64×32 и 64×64, остальное
@@ -14,7 +17,8 @@ import org.spongepowered.asm.mixin.Shadow;
  *
  * Код авторов (dima_dencep, Gravita; MIT), логика без изменений. Перенос на NeoForge 1.21.1:
  * приватные статические методы HttpTexture — через {@link Shadow} вместо access transformer, логгер свой
- * (шаблонный класс мода с API NeoForge 1.20 убран).
+ * (шаблонный класс мода с API NeoForge 1.20 убран). С 1.0.3 скины шириной 64 оставлены ванильному коду —
+ * вставка в начало метода вместо {@code @Overwrite} (совместимость с Entity Texture Features).
  */
 @Mixin(HttpTexture.class)
 public class MagicMixin {
@@ -30,11 +34,22 @@ public class MagicMixin {
     }
 
     /**
-     * @author dima_dencep, Gravita
-     * @reason поддержка скинов крупнее 64×64 — ванильная проверка размера пропускает только 64×32 и 64×64
+     * Скин шириной 64 (64×64, 64×32) — ванильный код, в него встраиваются и другие моды (Entity Texture Features);
+     * крупнее — обработка здесь. Вставка в начало, а не {@code @Overwrite}: в целиком заменённый метод Mixin не пускает
+     * чужие вставки с тем же приоритетом, и ETF ронял клиент.
      */
-    @Overwrite
-    private NativeImage processLegacySkin(NativeImage image) {
+    @Inject(method = "processLegacySkin", at = @At("HEAD"), cancellable = true)
+    private void hdskinsupport$processHdSkin(NativeImage image, CallbackInfoReturnable<NativeImage> cir) {
+        if (image.getWidth() != 64) {
+            cir.setReturnValue(hdskinsupport$processLegacySkin(image));
+        }
+    }
+
+    /**
+     * Код авторов (dima_dencep, Gravita) без изменений: ванильная обработка в масштабе «ширина / 64».
+     */
+    @Unique
+    private NativeImage hdskinsupport$processLegacySkin(NativeImage image) {
         int height = image.getHeight();
         int width = image.getWidth();
         int scale = width / 8;

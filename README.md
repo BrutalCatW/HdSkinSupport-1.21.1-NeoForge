@@ -28,16 +28,37 @@ Skipping jar. File mods\hdskinsupport-neoforge.jar is for Minecraft Forge or an 
 логгер свой; шаблонный класс мода (API NeoForge 1.20, которого в 21 нет) убран; `pack_format` 34.
 Логика обработки скина — без изменений.
 
+## Совместимость с Entity Texture Features (1.0.3)
+
+ETF 7.2.5 меняет тот же метод `HttpTexture.processLegacySkin`: открывает его своим access transformer и встраивается
+внутрь. С заменой метода целиком (`@Overwrite`) клиент падал дважды:
+
+- 1.0.1 (`@Overwrite private`) — замена закрытее цели, открытой ETF:
+  ```
+  Mixin apply for mod hdskinsupport failed hdskinsupport.mixins.json:MagicMixin -> net.minecraft.client.renderer.texture.HttpTexture:
+  PRIVATE @Overwrite method processLegacySkin ... cannot reduce visibiliy of PUBLIC target method
+  ```
+- 1.0.2 (`@Overwrite public`) — в целиком заменённый метод Mixin 0.8.7 пускает чужую вставку, только если приоритет
+  заменившего миксина ниже; у обоих 1000, и падал уже миксин ETF:
+  ```
+  Mixin [entity_texture_features.mixins.json:MixinPlayerSkinTexture ...] FAILED during APPLY
+  ... etf$differentAlpha with priority 1000 cannot inject into HttpTexture::processLegacySkin ... merged by ...MagicMixin with priority 1000
+  ```
+
+С 1.0.3 метод не заменяется: вставка в начало (`@Inject` в `HEAD`, такие Mixin разрешает всегда). Скин шириной 64
+(64×64, 64×32) идёт ванильным кодом — ETF и другие моды встраиваются в него как обычно; более крупный обрабатывается
+кодом мода (логика авторов без изменений) и сразу возвращается. Обработка ETF внутри этого метода на HD-скины не действует.
+
 ## Сборка
 
 ```
 $env:JAVA_HOME="C:\Program Files\Zulu\zulu-21"; ./gradlew.bat build
 ```
 
-Результат — `build/libs/hdskinsupport-neoforge-1.0.1.jar`. Ставится **только в клиентские mods**,
+Результат — `build/libs/hdskinsupport-neoforge-1.0.3.jar`. Ставится **только в клиентские mods**,
 серверу не нужен.
 
 ## Проверка
 
-- `latest.log`: в списке модов `HD Skin Support 1.0.1 (hdskinsupport)`, строки `Skipping jar` нет;
+- `latest.log`: в списке модов `HD Skin Support 1.0.3 (hdskinsupport)`, строки `Skipping jar` нет;
 - в игре HD-скин показывается, а не заменяется Стивом.

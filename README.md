@@ -55,7 +55,8 @@ ETF 7.2.5 меняет тот же метод `HttpTexture.processLegacySkin`: �
 $env:JAVA_HOME="C:\Program Files\Zulu\zulu-21"; ./gradlew.bat build
 ```
 
-Результат — `build/libs/hdskinsupport-neoforge-1.0.3.jar`. Ставится **только в клиентские mods**,
+Результат — `build/libs/HdSkinSupport-NeoForge-1.0.3.jar` (до 15.10.2026 — `hdskinsupport-neoforge-1.0.3.jar`; старый jar из mods
+убрать). Ставится **только в клиентские mods**,
 серверу не нужен.
 
 ## Проверка

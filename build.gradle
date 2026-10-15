@@ -2,7 +2,8 @@
 // Связка плагина и Gradle — как в официальном MDK (NeoForgeMDKs/MDK-1.21.1-ModDevGradle):
 // net.neoforged.moddev 2.0.148 + Gradle 9.2.1, Java 21.
 // Сборка: $env:JAVA_HOME="C:\Program Files\Zulu\zulu-21"; ./gradlew.bat build
-// Результат: build/libs/hdskinsupport-neoforge-<mod_version>.jar — только в клиентские mods.
+// Результат: build/libs/HdSkinSupport-NeoForge-<mod_version>.jar — только в клиентские mods.
+// Имя jar — по правилу проекта (07.09.2026) «<ИмяМода>-<версия>.jar» с припиской платформы.
 
 plugins {
     id 'java'
@@ -13,7 +14,7 @@ version = mod_version
 group = 'com.github.gravitlauncher.forge.hdskinsupport'
 
 base {
-    archivesName = 'hdskinsupport-neoforge'
+    archivesName = 'HdSkinSupport-NeoForge'
 }
 
 // Minecraft 1.21.1 идёт с Java 21
